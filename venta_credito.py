@@ -215,11 +215,6 @@ class venta_credito_wizard(osv.osv_memory):
         res = {}
         saldo = 0.0
         for form in self.browse(cr,uid,ids):
-            for line in form.cobros_ids:
-                val += line.abono
-        res = {}
-        saldo = 0.0
-        for form in self.browse(cr,uid,ids):
             res[form.id] = form.valor - form.entrada
         return res
     
@@ -379,8 +374,6 @@ class compra_credito_wizard(osv.osv_memory):
                                         'valor':form.valor,
                                         'saldo':form.saldo,
                                         })
-        import pdb
-        pdb.set_trace()
         return True
     
 compra_credito_wizard()
