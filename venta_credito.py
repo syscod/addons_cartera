@@ -198,6 +198,21 @@ class venta_credito_wizard(osv.osv_memory):
     
     _name = 'venta.credito.wizard'
     
+    def get_saldo(self, cr, uid, ids, context=None):
+        saldo = valor = entrada= 0.0
+        values={}
+        if context.get("entrada"):             
+            entrada=context.get("entrada")
+        if context.get("valor"):
+            valor=context.get("valor")
+        if context is None:
+            return True 
+        saldo = valor - entrada
+        if saldo < 0:
+            saldo=-999999999;
+        values = {'saldo':saldo}
+        return {'value':values}
+    
     def _get_saldo(self, cr, uid, ids, prop, unknow_none, context):
         val = 0.0
         res = {}
@@ -301,6 +316,21 @@ cobro_wizard()
 class compra_credito_wizard(osv.osv_memory):
     
     _name = 'compra.credito.wizard'
+    
+    def get_saldo(self, cr, uid, ids, context=None):
+        saldo = valor = entrada= 0.0
+        values={}
+        if context.get("entrada"):             
+            entrada=context.get("entrada")
+        if context.get("valor"):
+            valor=context.get("valor")
+        if context is None:
+            return True 
+        saldo = valor - entrada
+        if saldo < 0:
+            saldo=-999999999;
+        values = {'saldo':saldo}
+        return {'value':values}    
     
     def _get_saldo(self, cr, uid, ids, prop, unknow_none, context):
         res = {}
