@@ -13,11 +13,7 @@
 		             <field name="cliente_id" domain="[('customer','=',1)]" 
 		             on_change="on_change_cliente(cliente_id, context)"  
 		             context="{'es_venta':True}"/>
-<<<<<<< HEAD
                  	 <!-- <field name="cliente_id"/> INTEGRA ORDENES VENTA CLIENTES y PEDIDOS PROVEEDORES-->
-=======
-+                 <!-- <field name="cliente_id"/> INTEGRA ORDENES VENTA CLIENTES y PEDIDOS PROVEEDORES-->
->>>>>>> 4086070255d7de204ad720dd3279cfa7735c2ac6
 		             <field name="numero" colspan="2" string="Código"/>
 		             <field name="name" string="Descripción"/>
                  </group>

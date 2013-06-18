@@ -1,5 +1,5 @@
-addons_cartera
-==============
+addons_syscod_cartera
+=====================
 
 
 Módulo OpenERP7 para manejo de cartera.
@@ -25,7 +25,10 @@ a;ando esto
 ,,,,,,,,,,,,,,,,,,..............
 ---------------------------------
 000000000000000000000000000000000
-333333333333333333333333333333333
+
+
+
+He quitado tus 3ses y nada mas....bueno y he modificado la cabecera
 
 
 
