@@ -102,8 +102,8 @@
                  <field name="fecha_venta"/>
                  <newline/>
                  <field name="producto_id" domain="[('sale_ok','=',1)]"/>
-                 <field name="valor"/>
-                 <field name="entrada"/>
+                 <field name="valor" on_change="get_saldo(context)"  context="{'entrada':entrada,'valor':valor}"/>
+                 <field name="entrada" on_change="get_saldo(context)"  context="{'entrada':entrada,'valor':valor}"/>
                  <field name="saldo"/>
 		 <newline/>
                  
@@ -242,8 +242,8 @@
                  <field name="fecha_venta"/>
                  <newline/>
                  <field name="producto_id"/>
-                 <field name="valor"/>
-                 <field name="entrada"/>
+                 <field name="valor" on_change="get_saldo(context)"  context="{'entrada':entrada,'valor':valor}"/>
+                 <field name="entrada" on_change="get_saldo(context)"  context="{'entrada':entrada,'valor':valor}"/>
                  <field name="saldo"/>
 		 <newline/>
                  
