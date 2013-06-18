@@ -94,7 +94,6 @@
 		 <field name="numero"/>
                  <newline/>
                  <!-- <field name="cliente_id" domain="[('customer','=',1)]" context="{'es_venta':True}"/> -->
-                 <field name="cliente_id"/>
                  <field name="cliente_id" domain="[('customer','=',1)]" context="{'es_venta':True}"/>
                  <newline/>
                  <field name="garante_id"/>
@@ -231,11 +230,9 @@
                  <newline/>
                  <field name="cliente_id" string="Proveedor" domain="[('supplier','=',1)]"
                   context="{'default_customer': 0, 'search_default_supplier': 1, 'default_supplier': 1}" />
-        		 <field name="numero" string="Codigo"/>
-		         <field name="name" string="Descripción"/>
-                 	<!-- context="{'default_customer': 0, 'search_default_supplier': 1, 'default_supplier': 1}" /> -->
-		 		 <field name="numero" string="Codigo"/>
-		 		 <field name="name" string="Descripción"/>
+                 <field name="numero" string="Codigo"/>
+		 <field name="name" string="Descripción"/>
+                 <!-- context="{'default_customer': 0, 'search_default_supplier': 1, 'default_supplier': 1}" /> -->
                  <newline/>
                  <field name="garante_id"/>
                  <newline/>
