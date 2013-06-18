@@ -88,7 +88,11 @@ class venta_credito(osv.osv):
         val = ""
         for form in self.browse(cr, uid, ids, context=context):
             if form.numero and form.cliente_id.name:
-<<<<<<< HEAD
+                val= form.numero + "|" + form.cliente_id.name + "|" + form.fecha_venta
+            elif form.numero and not form.cliente_id.name:
+                val = form.numero + "|" + form.fecha_venta
+            elif not form.numero and form.cliente_id.name:
+                val = form.cliente_id.name + "|" + form.fecha_venta
                 val= form.numero + "|" + form.cliente_id.name + "|" + form.fecha_venta
             elif form.numero and not form.cliente_id.name:
                 val = form.numero + "|" + form.fecha_venta
@@ -97,21 +101,30 @@ class venta_credito(osv.osv):
             res[form.id] = val
         return res
 
-=======
-                val= form.numero + " " + form.cliente_id.name + " " + form.fecha_venta
-            elif form.numero and not form.cliente_id.name:
-                val = form.numero + " " + form.fecha_venta
-            elif not form.numero and form.cliente_id.name:
-                val = form.cliente_id.name + " " + form.fecha_venta
-            res[form.id] = val
-        return res
+    def onChange_pedido(self, cr, uid, ids, comprobante_id, context=None):
+        values={}
+        comprobant=self.pool.get('stock.picking.in').browse(cr, uid,comprobante_id, context)
+        if (comprobant):            
+            values['cliente_id']=comprobant.partner_id.name
+            values['direccion']=comprobant.partner_id.street
+            values['telefono']=comprobant.partner_id.phone
+        return {'value': values} or False
     
->>>>>>> 67a3f7f2b82f7242c6396a2f01238ea77d29abe8
+    def onChange_venta(self, cr, uid, ids, comprobante_id, context=None):
+        values={}
+        comprobant=self.pool.get('stock.picking.out').browse(cr, uid,comprobante_id, context)
+        if (comprobant):            
+            values['cliente_id']=comprobant.partner_id.name
+            values['direccion']=comprobant.partner_id.street
+            values['telefono']=comprobant.partner_id.phone
+        return {'value': values} or False
+
     _columns = {
                 #'name':fields.char('Nombre', size=512, help="Nombre de la venta realizada."),
                 'name':fields.function(_get_name, string='Nombre', type='char', help="Nombre del credito"),
                 'numero':fields.char('Numero', size=512, help="Identificador de la venta realizada."),
-                'cliente_id':fields.many2one('res.partner', 'Cliente', required = True, help="Cliente al que se le da el credito"),  
+                'cliente_id':fields.char('Cliente', size=64, required = True, help="Cliente al que se le da el credito"),
+                #'cliente_id':fields.many2one('res.partner', 'Cliente', required = True, help="Cliente al que se le da el credito"),  
                 'direccion':fields.char('Direccion', size=512, help="Direccion del cliente."),
                 'telefono':fields.char('Telefono', size=512, help="Telefono del Cliente."),
                 'garante_id':fields.many2one('res.partner', 'Garante', help="Garante del credito de la venta."),
@@ -122,14 +135,10 @@ class venta_credito(osv.osv):
                 'producto_id':fields.many2one('product.product', 'Articulo', help="Articulo que se incluye en la venta."),
                 'valor':fields.float('Valor', help="Valor del Articulo vendido."),
                 'saldo':fields.function(_get_saldo, string='Saldo', type='float', help="Valor pendiente a pagar"),
-<<<<<<< HEAD
                 #'pedidos':fields.many2one('stock.picking.in', 'Compra Ref', help="Pedido de compra No"),
                 #'ventas':fields.many2one('stock.picking.out', 'Venta Ref', help="Pedido de venta No"),
                 'pedidos':fields.char('Compra Ref',size=64, help="Pedido de compra No"),
                 'ventas':fields.char('Venta Ref',size=64, help="Pedido de venta No"),
-=======
-                #'saldo':fields.float('Saldo', help="Valor que queda de saldo."),
->>>>>>> 67a3f7f2b82f7242c6396a2f01238ea77d29abe8
                 'cobros_ids':fields.one2many('venta.cobro','venta_credito_id','Lineas de Cobros'),
                 'es_venta':fields.boolean('Es venta'),
                 }
@@ -190,18 +199,15 @@ class venta_credito_wizard(osv.osv_memory):
     _name = 'venta.credito.wizard'
     
     def _get_saldo(self, cr, uid, ids, prop, unknow_none, context):
-<<<<<<< HEAD
         val = 0.0
         res = {}
         saldo = 0.0
         for form in self.browse(cr,uid,ids):
             for line in form.cobros_ids:
                 val += line.abono
-=======
         res = {}
         saldo = 0.0
         for form in self.browse(cr,uid,ids):
->>>>>>> 67a3f7f2b82f7242c6396a2f01238ea77d29abe8
             res[form.id] = form.valor - form.entrada
         return res
     
@@ -210,33 +216,27 @@ class venta_credito_wizard(osv.osv_memory):
         val = ""
         for form in self.browse(cr, uid, ids, context=context):
             if form.numero and form.cliente_id.name:
-<<<<<<< HEAD
                 val= form.numero + "|" + form.cliente_id.name + "|" + form.fecha_venta
             elif form.numero and not form.cliente_id.name:
                 val = form.numero + "|" + form.fecha_venta
             elif not form.numero and form.cliente_id.name:
                 val = form.cliente_id.name + "|" + form.fecha_venta
-=======
-                val= form.numero + " " + form.cliente_id.name + " " + form.fecha_venta
+                val= form.numero + "|" + form.cliente_id.name + "|" + form.fecha_venta
             elif form.numero and not form.cliente_id.name:
-                val = form.numero + " " + form.fecha_venta
+                val = form.numero + "|" + form.fecha_venta
             elif not form.numero and form.cliente_id.name:
-                val = form.cliente_id.name + " " + form.fecha_venta
->>>>>>> 67a3f7f2b82f7242c6396a2f01238ea77d29abe8
+                val = form.cliente_id.name + "|" + form.fecha_venta
             res[form.id] = val
         return res
     
     _columns = {
-<<<<<<< HEAD
                 #'name':fields.char('Nombre', size=512, help="Nombre de la venta realizada."),
                 'name':fields.function(_get_name, string='Nombre', type='char', help="Nombre del credito"),
                 'numero':fields.char('Numero', size=512, help="Identificador de la venta realizada."),
                 'cliente_id':fields.many2one('res.partner', 'Cliente',required = True, help="Cliente al que se le da el credito"),
-=======
                 'name':fields.function(_get_name, string='Nombre', type='char', help="Nombre del credito"),
                 'numero':fields.char('Numero', size=512, help="Identificador de la venta realizada."),
                 'cliente_id':fields.many2one('res.partner', 'Cliente', required = True, help="Cliente al que se le da el credito"),
->>>>>>> 67a3f7f2b82f7242c6396a2f01238ea77d29abe8
                 'garante_id':fields.many2one('res.partner', 'Garante', help="Garante del credito de la venta."),
                 'entrada':fields.float('Entrada', help="Valor que se dio de entrada."),
                 'fecha_venta':fields.date('Date', readonly=True, select=True, help="Dia en que se realiza la venta"),
@@ -304,10 +304,7 @@ class compra_credito_wizard(osv.osv_memory):
     
     def _get_saldo(self, cr, uid, ids, prop, unknow_none, context):
         res = {}
-<<<<<<< HEAD
-=======
         saldo = 0.0
->>>>>>> 67a3f7f2b82f7242c6396a2f01238ea77d29abe8
         for form in self.browse(cr,uid,ids):
             res[form.id] = form.valor - form.entrada
         return res
@@ -317,23 +314,18 @@ class compra_credito_wizard(osv.osv_memory):
         val = ""
         for form in self.browse(cr, uid, ids, context=context):
             if form.numero and form.cliente_id.name:
-<<<<<<< HEAD
-                val= form.numero + "|"+ form.cliente_id.name + "|" + form.fecha_venta
+                val= form.numero + "|" + form.cliente_id.name + "|" + form.fecha_venta
             elif form.numero and not form.cliente_id.name:
-                val = form.numero + " " + form.fecha_venta
+                val = form.numero + "|" + form.fecha_venta
+            elif not form.numero and form.cliente_id.name:
+                val = form.cliente_id.name + "|" + form.fecha_venta
+                val= form.numero + "|" + form.cliente_id.name + "|" + form.fecha_venta
+            elif form.numero and not form.cliente_id.name:
+                val = form.numero + "|" + form.fecha_venta
             elif not form.numero and form.cliente_id.name:
                 val = form.cliente_id.name + "|" + form.fecha_venta
             res[form.id] = val
-        return res    
-=======
-                val= form.numero + " " + form.cliente_id.name + " " + form.fecha_venta
-            elif form.numero and not form.cliente_id.name:
-                val = form.numero + " " + form.fecha_venta
-            elif not form.numero and form.cliente_id.name:
-                val = form.cliente_id.name + " " + form.fecha_venta
-            res[form.id] = val
         return res
->>>>>>> 67a3f7f2b82f7242c6396a2f01238ea77d29abe8
     
     _columns = {
                 #'name':fields.char('Nombre', size=512, help="Nombre de la venta realizada."),

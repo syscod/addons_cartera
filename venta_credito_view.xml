@@ -10,7 +10,10 @@
                  <separator string="CLIENTE" colspan="4"/>                 
                  <field name="es_venta" invisible="1"/>
                  <group colspan="4" col="6">
-		             <field name="cliente_id" domain="[('customer','=',1)]" on_change="on_change_cliente(cliente_id, context)"  context="{'es_venta':True}"/>
+		             <field name="cliente_id" domain="[('customer','=',1)]" 
+		             on_change="on_change_cliente(cliente_id, context)"  
+		             context="{'es_venta':True}"/>
++                 <!-- <field name="cliente_id"/> INTEGRA ORDENES VENTA CLIENTES y PEDIDOS PROVEEDORES-->
 		             <field name="numero" colspan="2" string="Código"/>
 		             <field name="name" string="Descripción"/>
                  </group>
@@ -26,7 +29,8 @@
 	                 <field name="telefono2"/>
                  </group>
                  <separator string="Detalle" colspan="4"/> 
-                 <field name="producto_id" />               
+                 <field name="producto_id" />
+                 <!-- <field name="ventas" string="VENTAS" on_change="onChange_venta(ventas)" domain="[('type','=','out')]"/> INTEGRA ORDENES VENTA CLIENTES y PEDIDOS PROVEEDORES-->              
                  <group colspan="4" col="6">             
                  	<field name="valor" on_change="get_saldo(context)"  context="{'entrada':entrada,'valor':valor}"/>
                  	<field name="entrada" on_change="get_saldo(context)" context="{'entrada':entrada,'valor':valor}"/>
@@ -67,11 +71,7 @@
 	    <field name="type">form</field>
 	    <field name="arch" type="xml">  
 		<form string="Registro de Cobro">
-<<<<<<< HEAD
 		<field name="venta_credito_id" domain="[('es_venta','=',1)]"/>
-=======
-		 <field name="venta_credito_id" domain="[('es_venta','=',1)]"/>
->>>>>>> 67a3f7f2b82f7242c6396a2f01238ea77d29abe8
                  <newline/>
                  <field name="abono"/>
                  <newline/>
@@ -93,23 +93,15 @@
 		<form string="Registro de Venta">
 		 <field name="numero"/>
                  <newline/>
-<<<<<<< HEAD
                  <!-- <field name="cliente_id" domain="[('customer','=',1)]" context="{'es_venta':True}"/> -->
                  <field name="cliente_id"/>
-=======
                  <field name="cliente_id" domain="[('customer','=',1)]" context="{'es_venta':True}"/>
->>>>>>> 67a3f7f2b82f7242c6396a2f01238ea77d29abe8
                  <newline/>
                  <field name="garante_id"/>
                  <newline/>
                  <field name="fecha_venta"/>
                  <newline/>
-<<<<<<< HEAD
-                 <field name="producto_id"/>
-                 <!-- <field name="producto_id" domain="[('sale_ok','=',1)]"/> -->
-=======
                  <field name="producto_id" domain="[('sale_ok','=',1)]"/>
->>>>>>> 67a3f7f2b82f7242c6396a2f01238ea77d29abe8
                  <field name="valor"/>
                  <field name="entrada"/>
                  <field name="saldo"/>
@@ -127,8 +119,8 @@
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="view_venta_credito_tree"/>
-        <field name="view_id" ref="view_venta_credito_form"/>
         <field name="domain">[('es_venta','=',True)]</field>
+        <field name="context">{'form_view_ref' : 'syscod_cartera.view_venta_credito_form'}</field>
         </record>
 
         <record model="ir.actions.act_window" id="action_cobro_new_wizard">
@@ -162,6 +154,7 @@
                  <field name="cliente_id" string="Proveedor" domain="[('supplier','=',1)]" 
                  	on_change="on_change_cliente(cliente_id)" 
                  	context="{'default_customer': 0, 'search_default_supplier': 1, 'default_supplier': 1}" />
+                 <!-- <field name="cliente_id" string="Proveedor" /> INTEGRA ORDENES VENTA CLIENTES y PEDIDOS PROVEEDORES-->
 		 		 <field name="numero" string="Codigo"/>
 		 		 <field name="name" string="Descripción"/>
                  </group>	 
@@ -171,12 +164,9 @@
                  <field name="fecha_venta" string="Fecha de compra"/> 
                  </group>
                  <separator string="Detalle" colspan="4"/>
-<<<<<<< HEAD
-                 <field name="pedidos" string="PEDIDO" on_change="onChange_pedido(pedidos)" domain="[('type','=','in')]"/>
-                 <!-- <field name="producto_id" domain="[('purchase_ok','=',1)]"/> -->
-=======
+                 <!-- <field name="pedidos" string="PEDIDO" on_change="onChange_pedido(pedidos)" domain="[('type','=','in')]"/> INTEGRA ORDENES VENTA CLIENTES y PEDIDOS PROVEEDORES-->
                  <field name="producto_id" domain="[('purchase_ok','=',1)]"/>
->>>>>>> 67a3f7f2b82f7242c6396a2f01238ea77d29abe8
+
                  <newline/>
                  <group colspan="4" col="6">
                  	<field name="valor" on_change="get_saldo(context)"  context="{'entrada':entrada,'valor':valor}"/>
@@ -219,20 +209,12 @@
 	    <field name="type">form</field>
 	    <field name="arch" type="xml">  
 		<form string="Registro de pago">
-<<<<<<< HEAD
 		<field name="venta_credito_id" domain="[('es_venta','=',0)]"/>
-=======
-		 <field name="venta_credito_id" domain="[('es_venta','=',0)]"/>
->>>>>>> 67a3f7f2b82f7242c6396a2f01238ea77d29abe8
                  <newline/>
                  <field name="abono"/>
                  <newline/>
                  <field name="fecha_cobro"/>
-<<<<<<< HEAD
-		 		 <newline/>
-=======
-		 <newline/>
->>>>>>> 67a3f7f2b82f7242c6396a2f01238ea77d29abe8
+				 <newline/>
                  <button string="Guardar" name="do_pago" type="object"/>
                  <button string="Cancelar" special="cancel" icon="gtk-ok" />
 		</form>             
@@ -248,15 +230,12 @@
 		 <field name="numero"/>
                  <newline/>
                  <field name="cliente_id" string="Proveedor" domain="[('supplier','=',1)]"
-<<<<<<< HEAD
                   context="{'default_customer': 0, 'search_default_supplier': 1, 'default_supplier': 1}" />
         		 <field name="numero" string="Codigo"/>
 		         <field name="name" string="Descripción"/>
-=======
-                 	context="{'default_customer': 0, 'search_default_supplier': 1, 'default_supplier': 1}" />
+                 	<!-- context="{'default_customer': 0, 'search_default_supplier': 1, 'default_supplier': 1}" /> -->
 		 		 <field name="numero" string="Codigo"/>
 		 		 <field name="name" string="Descripción"/>
->>>>>>> 67a3f7f2b82f7242c6396a2f01238ea77d29abe8
                  <newline/>
                  <field name="garante_id"/>
                  <newline/>
@@ -280,8 +259,9 @@
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="view_compra_credito_tree"/>
-        <field name="view_id" ref="view_compra_credito_form"/>
         <field name="domain">[('es_venta','=',False)]</field>
+        <field name="context">{'form_view_ref' : 'syscod_cartera.view_compra_credito_form'}</field>
+        
         </record>
         
         <record model="ir.actions.act_window" id="action_pago_new_wizard">

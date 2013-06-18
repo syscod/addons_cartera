@@ -20,9 +20,9 @@
 ##############################################################################
 
 {
-    "name" : "Manejo de Ventas a Credito",
+    "name" : "Manejo de Cartera de Clientes y Proveedores",
     "version" : "1.0",
-    "description" : "Manejo de Ventas a Credito, cobros, clientes",
+    "description" : "Manejo de Cartera, cobros y pagos a clientes y proveedores respectivamente",
     "author" : "Syscod",
     'website': 'http://www.syscod.comyr.com/',
     "depends" : ['base','product',],
