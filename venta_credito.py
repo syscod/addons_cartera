@@ -365,4 +365,6 @@ class compra_credito_wizard(osv.osv_memory):
 compra_credito_wizard()
 
 
+#<!-- SOLO PROBANDOLE AL JORCH LO Q DIGO --> 
+
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
