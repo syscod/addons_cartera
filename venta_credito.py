@@ -233,11 +233,8 @@ class venta_credito_wizard(osv.osv_memory):
                 val = form.numero + "|" + form.fecha_venta
             elif not form.numero and form.cliente_id.name:
                 val = form.cliente_id.name + "|" + form.fecha_venta
-                val= form.numero + "|" + form.cliente_id.name + "|" + form.fecha_venta
             elif form.numero and not form.cliente_id.name:
                 val = form.numero + "|" + form.fecha_venta
-            elif not form.numero and form.cliente_id.name:
-                val = form.cliente_id.name + "|" + form.fecha_venta
             res[form.id] = val
         return res
     
@@ -346,11 +343,8 @@ class compra_credito_wizard(osv.osv_memory):
                 val = form.numero + "|" + form.fecha_venta
             elif not form.numero and form.cliente_id.name:
                 val = form.cliente_id.name + "|" + form.fecha_venta
-                val= form.numero + "|" + form.cliente_id.name + "|" + form.fecha_venta
             elif form.numero and not form.cliente_id.name:
                 val = form.numero + "|" + form.fecha_venta
-            elif not form.numero and form.cliente_id.name:
-                val = form.cliente_id.name + "|" + form.fecha_venta
             res[form.id] = val
         return res
     
