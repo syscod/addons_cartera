@@ -60,7 +60,7 @@
 	            <field name="direccion"/>
 			    <field name="fecha_venta" string="Fecha de Venta"/>
 			    <field name="valor"/>
-			    <field name="saldo"/>
+			    <field name="saldo1"/>
             </tree>
            </field>
         </record> 
@@ -197,7 +197,7 @@
 	            <field name="direccion"/>
 			    <field name="fecha_venta" string="Fecha de compra"/>
 			    <field name="valor"/>
-			    <field name="saldo"/>
+			    <field name="saldo1"/>
             </tree>
            </field>
         </record>

@@ -16,8 +16,7 @@ class venta_credito(osv.osv):
         if context.get("entrada"):             
             ent=context.get("entrada")
         if context.get("valor"):
-            va=context.get("valor")
-          
+            va=context.get("valor")          
         if context is None:
             return True
         for form in self.browse(cr, uid, ids, context=context):
@@ -74,6 +73,7 @@ class venta_credito(osv.osv):
     
     def _get_saldo(self, cr, uid, ids, prop, unknow_none, context):
         res = {}
+        values={}
         val = saldo = 0.0
         for form in self.browse(cr, uid, ids, context=context):
             if form.cobros_ids:
@@ -81,6 +81,9 @@ class venta_credito(osv.osv):
                     val += line.abono
             saldo = form.valor - val - form.entrada
             res[form.id] = saldo
+            values['saldo1']=saldo # Para el tree
+        if values:
+            self.write(cr, uid, ids, values)
         return res
     
     def _get_name(self, cr, uid, ids, prop, unknow_none, context):
@@ -132,6 +135,7 @@ class venta_credito(osv.osv):
                 'producto_id':fields.many2one('product.product', 'Articulo', help="Articulo que se incluye en la venta."),
                 'valor':fields.float('Valor', help="Valor del Articulo vendido."),
                 'saldo':fields.function(_get_saldo, string='Saldo', type='float', help="Valor pendiente a pagar"),
+                'saldo1':fields.float('Saldo', help="Saldo pendiente."),
                 #'pedidos':fields.many2one('stock.picking.in', 'Compra Ref', help="Pedido de compra No"),
                 #'ventas':fields.many2one('stock.picking.out', 'Venta Ref', help="Pedido de venta No"),
                 'pedidos':fields.char('Compra Ref',size=64, help="Pedido de compra No"),
