@@ -7,46 +7,47 @@
 	    <field name="type">form</field>
 	    <field name="arch" type="xml">  
 		<form string="Creación de KARDEX" version="7.0">
-                 <separator string="CLIENTE" colspan="4"/>                 
-                 <field name="es_venta" invisible="1"/>
-                 <group colspan="4" col="6">
-		             <field name="cliente_id" domain="[('customer','=',1)]" 
-		             on_change="on_change_cliente(cliente_id, context)"  
-		             context="{'es_venta':True}"/>
-                 	 <!-- <field name="cliente_id"/> INTEGRA ORDENES VENTA CLIENTES y PEDIDOS PROVEEDORES-->
-		             <field name="numero" colspan="2" string="Código"/>
-		             <field name="name" string="Descripción"/>
-                 </group>
-                 <group colspan="4" col="6">  
+			<sheet bgcolor="green">
+			<field name="es_venta" invisible="1"/>
+			<group colspan="4" col="4">               
+	                 <field name="numero" bgcolor="green" string="Código"/>
+			         <field name="name" string="Descripción"/>                 
+			         <field name="cliente_id" domain="[('customer','=',1)]" 
+			                on_change="on_change_cliente(cliente_id, context)"  
+			                context="{'es_venta':True, 'numero':numero, 'fecha_venta':fecha_venta, 'cliente_id':cliente_id}"/>
+	                 	 	<!-- <field name="cliente_id"/> INTEGRA ORDENES VENTA CLIENTES y PEDIDOS PROVEEDORES-->
+	                 <field name="fecha_venta" string="Fecha de venta"/>
 	                 <field name="direccion"/>
-		             <field name="telefono"/>
-		             <field name="fecha_venta" string="Fecha de venta"/>
-				 </group>                                                 
-                 <separator string="GARANTE" colspan="4"/>
-                 <group colspan="4" col="6"> 
+			         <field name="telefono"/>
+			 </group>		                                                                                        
+             <group colspan="4" col="4">
+                 	 <newline/>
                  	 <field name="garante_id"/>
+                 	 <field name="cart_cl"/>
 	                 <field name="direccion2"/>
 	                 <field name="telefono2"/>
-                 </group>
-                 <separator string="Detalle" colspan="4"/> 
-                 <field name="producto_id" />
-                 <!-- <field name="ventas" string="VENTAS" on_change="onChange_venta(ventas)" domain="[('type','=','out')]"/> INTEGRA ORDENES VENTA CLIENTES y PEDIDOS PROVEEDORES-->              
-                 <group colspan="4" col="6">             
+	          </group>
+	          <group colspan="4" col="4">       	                 
+                	 <field name="producto_id" />
+              </group> 
+                 	<!-- <field name="ventas" string="VENTAS" on_change="onChange_venta(ventas)" domain="[('type','=','out')]"/> INTEGRA ORDENES VENTA CLIENTES y PEDIDOS PROVEEDORES-->
+              <group colspan="4" col="6">                          
                  	<field name="valor" on_change="get_saldo(context)"  context="{'entrada':entrada,'valor':valor}"/>
                  	<field name="entrada" on_change="get_saldo(context)" context="{'entrada':entrada,'valor':valor}"/>
                  	<field name="saldo"/>
-                 </group>
-                 <div style="width: 50%%">               
+              </group>
+                 <div style="width: 100%%">               
                  <field name="cobros_ids" string="Líneas de cobros" >
-                 	<tree string="Cobros" editable="bottom" style="width: 50%%; border-bottom:1px solid #666;">
-                    	<field name="fecha_cobro" string="Fecha de cobro"/>
+                 	<tree string="Cobros" editable="bottom">
+                    	<field name="fecha_cobro" widget="date" string="Fecha de cobro"/>
                         <field name="total" />                            
-                        <field name="abono" sum="Total Pagado"/>
+                        <field name="abono" sum="Total cobrado"/>
                         <field name="interes" sum="Total Interes" />
                         <field name="saldo" />
                  	</tree>
                  </field>
                  </div>
+           </sheet>
 		</form>             
 	    </field>
 	</record>
@@ -77,9 +78,11 @@
                  <newline/>
                  <field name="interes"/>
                  <newline/>
-                 <field name="fecha_cobro"/>
+                 <field name="fecha_cobro" string="Fecha de cobro"/>
 		 <newline/>
-                 <button string="Guardar" name="do_cobro" type="object"/>
+                 <button string="Guardar" name="do_cobro"   
+                 context="{'abono':abono, 'interes':interes, 'fecha_cobro':fecha_cobro, 'venta_credito_id':venta_credito_id}" 
+                 type="object"/>
                  <button string="Cancelar" special="cancel" icon="gtk-ok" />
 		</form>             
 	    </field>
@@ -106,7 +109,9 @@
                  <field name="saldo"/>
 		 <newline/>
                  
-                 <button string="Guardar" name="do_venta" type="object"/>
+                 <button string="Guardar" name="do_venta"  
+                 context="{'numero':numero, 'fecha_venta':fecha_venta, 'garante_id':garante_id, 'cliente_id':cliente_id}" 
+                 type="object"/>
                  <button string="Cancelar" special="cancel" icon="gtk-ok" />
 		</form>             
 	    </field>
@@ -148,41 +153,41 @@
 	    <field name="type">form</field>
 	    <field name="arch" type="xml">  
 		<form string="Registrar compra" version="7.0">
-                 <field name="es_venta" invisible="1"/>
-                 <group colspan="2" col="6">
-                 <field name="cliente_id" string="Proveedor" domain="[('supplier','=',1)]" 
-                 	on_change="on_change_cliente(cliente_id)" 
-                 	context="{'default_customer': 0, 'search_default_supplier': 1, 'default_supplier': 1}" />
-                 <!-- <field name="cliente_id" string="Proveedor" /> INTEGRA ORDENES VENTA CLIENTES y PEDIDOS PROVEEDORES-->
-		 		 <field name="numero" string="Codigo"/>
-		 		 <field name="name" string="Descripción"/>
-                 </group>	 
-                 <group colspan="4" col="6">                              
-                 <field name="direccion"/>
-                 <field name="telefono"/>
-                 <field name="fecha_venta" string="Fecha de compra"/> 
-                 </group>
-                 <separator string="Detalle" colspan="4"/>
-                 <!-- <field name="pedidos" string="PEDIDO" on_change="onChange_pedido(pedidos)" domain="[('type','=','in')]"/> INTEGRA ORDENES VENTA CLIENTES y PEDIDOS PROVEEDORES-->
-                 <field name="producto_id" domain="[('purchase_ok','=',1)]"/>
-
-                 <newline/>
-                 <group colspan="4" col="6">
+			<sheet bgcolor="green">
+			<field name="es_venta" invisible="1"/>
+			<group colspan="4" col="4">               
+	                 <field name="numero" bgcolor="green" string="Código"/>
+			         <field name="name" string="Descripción"/>                 
+			         <field name="cliente_id" string="Proveedor" domain="[('supplier','=',1)]" 
+                 			on_change="on_change_cliente(cliente_id, context)" 
+                 			context="{'default_customer': 0,'numero':numero, 'fecha_venta':fecha_venta, 'cliente_id':cliente_id, 'search_default_supplier': 1, 'default_supplier': 1}" />
+                 			
+                 			<!-- <field name="cliente_id" string="Proveedor" /> INTEGRA ORDENES VENTA CLIENTES y PEDIDOS PROVEEDORES-->
+	                 <field name="fecha_venta" string="Fecha de venta"/>
+	                 <field name="direccion"/>
+			         <field name="telefono"/>
+			 </group>		                                                                                        
+	          <group colspan="4" col="4">       	                 
+                	 <field name="producto_id" domain="[('purchase_ok','=',1)]"/>
+              </group> 
+                 	<!-- <field name="ventas" string="VENTAS" on_change="onChange_venta(ventas)" domain="[('type','=','out')]"/> INTEGRA ORDENES VENTA CLIENTES y PEDIDOS PROVEEDORES-->
+              <group colspan="4" col="6">                          
                  	<field name="valor" on_change="get_saldo(context)"  context="{'entrada':entrada,'valor':valor}"/>
                  	<field name="entrada" string="Abono inicial"  on_change="get_saldo(context)" context="{'entrada':entrada, 'valor':valor}"/>
                  	<field name="saldo"/>
-                 </group>
-                 <div style="width: 50%%" align="right">
+              </group>
+                 <div style="width: 100%%">               
                  <field name="cobros_ids" string="Lineas de Pagos" widget="one2many_list">
-                       <tree string="Pagos">
-                            <field name="fecha_cobro" string="Fecha de pago" width="20"/>
-                            <field name="total" width="20"/>                            
-                            <field name="abono" sum="Total Pagado" width="20"/>
-                            <field name="interes" sum="Total Interes" width="20"/>
-                            <field name="saldo" width="20"/>
-                       </tree>
+                 	<tree string="Cobros" editable="bottom">
+                    	<field name="fecha_cobro" string="Fecha de pago" width="20"/>
+                        <field name="total" />                            
+                        <field name="abono" sum="Total Pagado"/>
+                        <field name="interes" sum="Total Interes" />
+                        <field name="saldo" />
+                 	</tree>
                  </field>
                  </div>
+           </sheet>    
 		</form>
            
 	    </field>
@@ -212,9 +217,11 @@
                  <newline/>
                  <field name="abono"/>
                  <newline/>
-                 <field name="fecha_cobro"/>
+                 <field name="fecha_cobro" string="Fecha de pago"/>
 				 <newline/>
-                 <button string="Guardar" name="do_pago" type="object"/>
+                 <button string="Guardar" name="do_pago"    
+                 context="{'abono':abono, 'fecha_cobro':fecha_cobro, 'venta_credito_id':venta_credito_id}" 
+                 type="object"/>
                  <button string="Cancelar" special="cancel" icon="gtk-ok" />
 		</form>             
 	    </field>
@@ -226,25 +233,24 @@
 	    <field name="type">form</field>
 	    <field name="arch" type="xml">  
 		<form string="Registro de compra">
-		 <field name="numero"/>
+		 		 <field name="numero"/>
                  <newline/>
                  <field name="cliente_id" string="Proveedor" domain="[('supplier','=',1)]"
                   context="{'default_customer': 0, 'search_default_supplier': 1, 'default_supplier': 1}" />
-                 <field name="numero" string="Codigo"/>
-		 <field name="name" string="Descripción"/>
+		 		 <field name="name" string="Descripción"/>
                  <!-- context="{'default_customer': 0, 'search_default_supplier': 1, 'default_supplier': 1}" /> -->
                  <newline/>
-                 <field name="garante_id"/>
-                 <newline/>
-                 <field name="fecha_venta"/>
+                 <field name="fecha_venta" string="Fecha de compra"/>
                  <newline/>
                  <field name="producto_id"/>
                  <field name="valor" on_change="get_saldo(context)"  context="{'entrada':entrada,'valor':valor}"/>
-                 <field name="entrada" on_change="get_saldo(context)"  context="{'entrada':entrada,'valor':valor}"/>
+                 <field name="entrada" string="Abono inicial" on_change="get_saldo(context)"  context="{'entrada':entrada,'valor':valor}"/>
                  <field name="saldo"/>
 		 <newline/>
                  
-                 <button string="Guardar" name="do_compra" type="object"/>
+                 <button string="Guardar" name="do_compra" 
+                 context="{'numero':numero, 'fecha_venta':fecha_venta, 'cliente_id':cliente_id}" 
+                 type="object"/>
                  <button string="Cancelar" special="cancel" icon="gtk-ok" />
 		</form>             
 	    </field>
