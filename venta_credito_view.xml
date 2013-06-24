@@ -40,10 +40,10 @@
                  <field name="cobros_ids" string="Líneas de cobros" >
                  	<tree string="Cobros" editable="bottom">
                     	<field name="fecha_cobro" widget="date" string="Fecha de cobro"/>
-                        <field name="total" />                            
-                        <field name="abono" sum="Total cobrado"/>
+                        <field name="total"/>                            
+                        <field name="abono" on_change="get_total(abono,context)" context="{'abono':abono, 'venta_id':parent.id, 'cobro_id':id}" sum="Total cobrado"/>
                         <field name="interes" sum="Total Interes" />
-                        <field name="saldo" />
+                        <field name="saldo"/>
                  	</tree>
                  </field>
                  </div>
@@ -71,20 +71,25 @@
 	    <field name="model">cobro.wizard</field>
 	    <field name="type">form</field>
 	    <field name="arch" type="xml">  
-		<form string="Registro de Cobro">
-		<field name="venta_credito_id" domain="[('es_venta','=',1)]"/>
-                 <newline/>
-                 <field name="abono"/>
-                 <newline/>
-                 <field name="interes"/>
-                 <newline/>
-                 <field name="fecha_cobro" string="Fecha de cobro"/>
-		 <newline/>
+		<form string="Registro de Cobro" version="7.0">
+			<separator string="Ingrese el abono del cliente:" colspan="4" />
+			<group>
+				 <field name="venta_credito_id" domain="[('es_venta','=',1)]" class="oe_inline"/>
+				 <label for="abono"/>
+                 <div> 
+                    <field name="abono" class="oe_inline"/>
+                 	<field name="fecha_cobro" string="Fecha de cobro" class="oe_inline"/>
+                    <label align="0.7" string="Valor y fecha del Abono" class="oe_inline"/>
+                </div>
+                <field name="interes" class="oe_inline"/> 
+		 	</group>
+		 	<footer>
                  <button string="Guardar" name="do_cobro"   
                  context="{'abono':abono, 'interes':interes, 'fecha_cobro':fecha_cobro, 'venta_credito_id':venta_credito_id}" 
-                 type="object"/>
-                 <button string="Cancelar" special="cancel" icon="gtk-ok" />
-		</form>             
+                 type="object" icon="gtk-ok"  class="oe_highlight"/>
+                 <button string="Cancelar" special="cancel" icon="gtk-cancel" class="oe_link"/>
+            </footer>
+		</form>                
 	    </field>
 	</record>
 
@@ -93,27 +98,24 @@
 	    <field name="model">venta.credito.wizard</field>
 	    <field name="type">form</field>
 	    <field name="arch" type="xml">  
-		<form string="Registro de Venta">
-		 <field name="numero"/>
-                 <newline/>
-                 <!-- <field name="cliente_id" domain="[('customer','=',1)]" context="{'es_venta':True}"/> -->
-                 <field name="cliente_id" domain="[('customer','=',1)]" context="{'es_venta':True}"/>
-                 <newline/>
-                 <field name="garante_id"/>
-                 <newline/>
-                 <field name="fecha_venta"/>
-                 <newline/>
-                 <field name="producto_id" domain="[('sale_ok','=',1)]"/>
-                 <field name="valor" on_change="get_saldo(context)"  context="{'entrada':entrada,'valor':valor}"/>
-                 <field name="entrada" on_change="get_saldo(context)"  context="{'entrada':entrada,'valor':valor}"/>
-                 <field name="saldo"/>
-		 <newline/>
-                 
+		<form string="Registro de Venta" version="7.0">
+			<group class="oe_text_center">				
+		 		 <field name="numero" class="oe_inline" placeholder="VENT0001..."/>
+                 <field name="cliente_id" domain="[('customer','=',1)]" context="{'es_venta':True}" class="oe_inline"/>
+                 <field name="garante_id" class="oe_inline"/>
+                 <field name="fecha_venta" class="oe_inline"/>
+                 <field name="producto_id" domain="[('sale_ok','=',1)]" class="oe_inline"/>   
+                 <field name="valor" on_change="get_saldo(context)"  context="{'entrada':entrada,'valor':valor}" class="oe_inline"/>
+                 <field name="entrada" on_change="get_saldo(context)"  context="{'entrada':entrada,'valor':valor}" class="oe_inline"/>
+                 <field name="saldo" class="oe_inline"/>                
+            </group>                   
+            <footer>     
                  <button string="Guardar" name="do_venta"  
                  context="{'numero':numero, 'fecha_venta':fecha_venta, 'garante_id':garante_id, 'cliente_id':cliente_id}" 
-                 type="object"/>
-                 <button string="Cancelar" special="cancel" icon="gtk-ok" />
-		</form>             
+                 type="object" icon="gtk-ok" class="oe_highlight"/>
+                 <button string="Cancelar" special="cancel" icon="gtk-cancel" class="oe_link"/>
+            </footer>
+		</form>           
 	    </field>
 	</record>
 	        <record model="ir.actions.act_window" id="action_venta_credito_new_form">
@@ -168,7 +170,7 @@
 			         <field name="telefono"/>
 			 </group>		                                                                                        
 	          <group colspan="4" col="4">       	                 
-                	 <field name="producto_id" domain="[('purchase_ok','=',1)]"/>
+                	 <field name="producto_id"/>
               </group> 
                  	<!-- <field name="ventas" string="VENTAS" on_change="onChange_venta(ventas)" domain="[('type','=','out')]"/> INTEGRA ORDENES VENTA CLIENTES y PEDIDOS PROVEEDORES-->
               <group colspan="4" col="6">                          
@@ -181,7 +183,7 @@
                  	<tree string="Cobros" editable="bottom">
                     	<field name="fecha_cobro" string="Fecha de pago" width="20"/>
                         <field name="total" />                            
-                        <field name="abono" sum="Total Pagado"/>
+                        <field name="abono" on_change="get_total(abono,context)" context="{'abono':abono, 'venta_id':parent.id, 'cobro_id':id}"  sum="Total Pagado"/>
                         <field name="interes" sum="Total Interes" />
                         <field name="saldo" />
                  	</tree>
@@ -212,17 +214,18 @@
 	    <field name="model">pago.wizard</field>
 	    <field name="type">form</field>
 	    <field name="arch" type="xml">  
-		<form string="Registro de pago">
-		<field name="venta_credito_id" domain="[('es_venta','=',0)]"/>
-                 <newline/>
-                 <field name="abono"/>
-                 <newline/>
-                 <field name="fecha_cobro" string="Fecha de pago"/>
-				 <newline/>
-                 <button string="Guardar" name="do_pago"    
-                 context="{'abono':abono, 'fecha_cobro':fecha_cobro, 'venta_credito_id':venta_credito_id}" 
-                 type="object"/>
-                 <button string="Cancelar" special="cancel" icon="gtk-ok" />
+		<form string="Registro de pago" version="7.0">
+			<group>
+				 <field name="venta_credito_id" domain="[('es_venta','=',0)]" class="oe_inline"/>
+                 <field name="abono" class="oe_inline"/>
+                 <field name="fecha_cobro" string="Fecha de pago" class="oe_inline"/>
+			</group>
+			<footer>
+	             <button string="Guardar" name="do_pago"    
+	                 context="{'abono':abono, 'fecha_cobro':fecha_cobro, 'venta_credito_id':venta_credito_id}" 
+	                 type="object" icon="gtk-ok" class="oe_highlight"/>
+	            <button string="Cancelar" special="cancel" icon="gtk-cancel" class="oe_link" />
+            </footer>
 		</form>             
 	    </field>
 	</record>
@@ -232,26 +235,25 @@
 	    <field name="model">compra.credito.wizard</field>
 	    <field name="type">form</field>
 	    <field name="arch" type="xml">  
-		<form string="Registro de compra">
-		 		 <field name="numero"/>
-                 <newline/>
+		<form string="Registro de compra" version="7.0">		  
+			<group>
+		 		 <field name="numero" class="oe_inline"/>
+		 		 <field name="name" string="Descripción" class="oe_inline"/>
                  <field name="cliente_id" string="Proveedor" domain="[('supplier','=',1)]"
-                  context="{'default_customer': 0, 'search_default_supplier': 1, 'default_supplier': 1}" />
-		 		 <field name="name" string="Descripción"/>
-                 <!-- context="{'default_customer': 0, 'search_default_supplier': 1, 'default_supplier': 1}" /> -->
-                 <newline/>
-                 <field name="fecha_venta" string="Fecha de compra"/>
-                 <newline/>
-                 <field name="producto_id"/>
-                 <field name="valor" on_change="get_saldo(context)"  context="{'entrada':entrada,'valor':valor}"/>
-                 <field name="entrada" string="Abono inicial" on_change="get_saldo(context)"  context="{'entrada':entrada,'valor':valor}"/>
-                 <field name="saldo"/>
-		 <newline/>
-                 
-                 <button string="Guardar" name="do_compra" 
+                  context="{'default_customer': 0, 'search_default_supplier': 1, 'default_supplier': 1}"  class="oe_inline"/>
+                 <field name="fecha_venta" string="Fecha de compra" class="oe_inline"/>
+                 <field name="producto_id" class="oe_inline"/>     
+                 <field name="valor" on_change="get_saldo(context)"  context="{'entrada':entrada,'valor':valor}" class="oe_inline"/>
+                 <field name="entrada" string="Abono inicial" on_change="get_saldo(context)"  context="{'entrada':entrada,'valor':valor}" class="oe_inline"/>
+                 <field name="saldo" class="oe_inline"/>
+           </group>            
+		 <footer>
+                <button string="Guardar" name="do_compra" 
                  context="{'numero':numero, 'fecha_venta':fecha_venta, 'cliente_id':cliente_id}" 
-                 type="object"/>
-                 <button string="Cancelar" special="cancel" icon="gtk-ok" />
+                 type="object" icon="gtk-ok" class="oe_highlight"/>
+                 <button string="Cancelar" special="cancel" icon="gtk-cancel" class="oe_link"/>   
+         </footer>     
+         
 		</form>             
 	    </field>
 	</record>

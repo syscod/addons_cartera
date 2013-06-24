@@ -152,7 +152,7 @@ class venta_credito(osv.osv):
                 'direccion2':fields.char('Direccion', size=512, help="Direccion del garante."),
                 'telefono2':fields.char('Telefono', size=512, help="Telefono del garante."),
                 'entrada':fields.float('Entrada', help="Valor que se dio de entrada."),
-                'fecha_venta':fields.date('Date', readonly=True, help="Dia en que se realiza la venta"),
+                'fecha_venta':fields.date('Fecha', help="Dia en que se realiza la venta"),
                 'producto_id':fields.many2one('product.product', 'Articulo', help="Articulo que se incluye en la venta."),
                 'valor':fields.float('Valor', help="Valor del Articulo vendido."),
                 'saldo':fields.function(_get_saldo, string='Saldo', type='float', help="Valor pendiente a pagar"),
@@ -173,13 +173,39 @@ venta_credito()
 
 class venta_cobro(osv.osv):
     _name = 'venta.cobro'
+
+    def get_total(self, cr, uid, ids, abono, context):
+        venta_id=0;
+        tree= self.browse(cr, uid, ids, context=context)
+        if not context:
+            context={}
+        else:
+            venta_id= context.get('venta_id')
+            cobro_id= context.get('cobro_id')
+        values={}
+        val={}
+        import pdb
+        pdb.set_trace()
+        venta = self.pool.get('venta.credito').browse(cr,uid,venta_id,context)
+        inv_obj = self.pool.get('venta.credito')
+        values['total']=venta.saldo
+        saldo = values['total'] - abono
+        if saldo < 0:
+            saldo=-999999999;
+        else:
+            values['saldo']=saldo
+            val['saldo1']=saldo
+            inv_obj.write(cr, uid, venta_id, val, context=context)
+            self.write(cr, uid, ids, values, context)
+        return {'value':values}
+        
     _columns = {
                 'venta_credito_id':fields.many2one('venta.credito', 'Venta', required=1, ondelete='cascade'),
                 'abono': fields.float('Abono', help="Valor que se abona a la deuda."),
                 'interes': fields.float('Interes', help="Registro de interes."),
                 'total': fields.float('Total', help="Total."),
                 'saldo': fields.float('Saldo', help="Saldo pendiente."),
-                'fecha_cobro':fields.date('Date', readonly=True, select=True, help="Dia en que se realiza el pago"),
+                'fecha_cobro':fields.date('Fecha', select=True, help="Dia en que se realiza el pago"),
                 }
     
     _defaults = {
@@ -192,7 +218,7 @@ class cobro_wizard(osv.osv_memory):
     _name = 'cobro.wizard'
     
     def get_total(self, cr, uid, ids, venta_id, context=None):
-        saldo = valor = entrada= 0.0
+        saldo = valor = entrada =abono= 0.0
         values={}
         val={}
         venta = self.pool.get('venta.credito').browse(cr,uid,venta_id,context)
@@ -218,7 +244,7 @@ class cobro_wizard(osv.osv_memory):
                 'venta_credito_id':fields.many2one('venta.credito', 'Venta', required=1, ondelete='cascade'),
                 'abono': fields.float('Abono', help="Valor que se dio de entrada."),
                 'interes': fields.float('Interes', help="Valor que se dio de entrada."),
-                'fecha_cobro':fields.date('Date', readonly=True, select=True, help="Dia en que se realiza la venta"),
+                'fecha_cobro':fields.date('Fecha', select=True, help="Dia en que se realiza la venta"),
                 }
     
     _defaults = {
@@ -354,7 +380,7 @@ class venta_credito_wizard(osv.osv_memory):
                 'cliente_id':fields.many2one('res.partner', 'Cliente', required = True, help="Cliente al que se le da el credito"),
                 'garante_id':fields.many2one('res.partner', 'Garante', help="Garante del credito de la venta."),
                 'entrada':fields.float('Entrada', help="Valor que se dio de entrada."),
-                'fecha_venta':fields.date('Date', readonly=True, select=True, help="Dia en que se realiza la venta"),
+                'fecha_venta':fields.date('Fecha', select=True, help="Dia en que se realiza la venta"),
                 'producto_id':fields.many2one('product.product', 'Articulo', help="Articulo que se incluye en la venta."),
                 'valor':fields.float('Valor', help="Valor del Articulo vendido."),
                 'saldo':fields.function(_get_saldo, string='Saldo', type='float'),
@@ -433,7 +459,7 @@ class pago_wizard(osv.osv_memory):
                 'venta_credito_id':fields.many2one('venta.credito', 'Venta', required=1, ondelete='cascade'),
                 'abono': fields.float('Abono', help="Valor que se dio de entrada."),
                 'interes': fields.float('Interes', help="Valor que se dio de entrada."),
-                'fecha_cobro':fields.date('Date', readonly=True, select=True, help="Dia en que se realiza la venta"),
+                'fecha_cobro':fields.date('Fecha', select=True, help="Dia en que se realiza la venta"),
                 }
     
     _defaults = {
@@ -560,7 +586,7 @@ class compra_credito_wizard(osv.osv_memory):
                 'cliente_id':fields.many2one('res.partner', 'Cliente', required = True, help="Cliente al que se le da el credito"),
                 'garante_id':fields.many2one('res.partner', 'Garante', help="Garante del credito de la venta."),
                 'entrada':fields.float('Entrada', help="Valor que se dio de entrada."),
-                'fecha_venta':fields.date('Date', readonly=True, select=True, help="Dia en que se realiza la venta"),
+                'fecha_venta':fields.date('Fecha', select=True, help="Dia en que se realiza la venta"),
                 'producto_id':fields.many2one('product.product', 'Articulo', help="Articulo que se incluye en la venta."),
                 'valor':fields.float('Valor', help="Valor del Articulo vendido."),
                 'saldo':fields.function(_get_saldo, string='Saldo', type='float'),
