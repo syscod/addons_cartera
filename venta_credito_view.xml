@@ -41,8 +41,8 @@
                  	<tree string="Cobros" editable="bottom">
                     	<field name="fecha_cobro" widget="date" string="Fecha de cobro"/>
                         <field name="total"/>                            
-                        <field name="abono" on_change="get_total(abono,context)" context="{'abono':abono, 'venta_id':parent.id, 'cobro_id':id}" sum="Total cobrado"/>
-                        <field name="interes" sum="Total Interes" />
+                        <field name="abono" on_change="get_total(abono,context)" context="{'abono':abono, 'total':total, 'interes':interes, 'venta_id':parent.id, 'cobro_id':id}" sum="Total cobrado"/>
+                        <field name="interes" on_change="get_total(abono,context)" context="{'abono':abono,'total':total,'interes':interes, 'venta_id':parent.id, 'cobro_id':id}" sum="Total Interes" />
                         <field name="saldo"/>
                  	</tree>
                  </field>
@@ -183,8 +183,8 @@
                  	<tree string="Cobros" editable="bottom">
                     	<field name="fecha_cobro" string="Fecha de pago" width="20"/>
                         <field name="total" />                            
-                        <field name="abono" on_change="get_total(abono,context)" context="{'abono':abono, 'venta_id':parent.id, 'cobro_id':id}"  sum="Total Pagado"/>
-                        <field name="interes" sum="Total Interes" />
+                        <field name="abono" on_change="get_total(abono,context)" context="{'abono':abono, 'total':total, 'interes':interes, 'venta_id':parent.id, 'cobro_id':id}"  sum="Total Pagado"/>
+                        <field name="interes" on_change="get_total(abono,context)" context="{'abono':abono, 'total':total, 'interes':interes, 'venta_id':parent.id, 'cobro_id':id}" sum="Total Interes" />
                         <field name="saldo" />
                  	</tree>
                  </field>

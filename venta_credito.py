@@ -34,7 +34,7 @@ class venta_credito(osv.osv):
             saldo=-999999999;
         values = {'saldo':saldo}
         return {'value':values}
-    
+     
     def get_name(self, cr, uid, ids, context):
         #import pdb
         #pdb.set_trace()
@@ -93,16 +93,43 @@ class venta_credito(osv.osv):
     def _get_saldo(self, cr, uid, ids, prop, unknow_none, context):
         res = {}
         values={}
-        val = saldo = 0.0
+        val = saldo = interes= linesaldo= 0.0
         for form in self.browse(cr, uid, ids, context=context):
+            venta_id=form.id
             if form.cobros_ids:
                 for line in form.cobros_ids:
                     val += line.abono
-            saldo = form.valor - val - form.entrada
+                    interes += line.interes
+                    linesaldo=line.saldo
+            saldo = form.valor - val - form.entrada + interes
             res[form.id] = saldo
             values['saldo1']=saldo # Para el tree
         if values:
             self.write(cr, uid, ids, values)
+        #import pdb
+        #pdb.set_trace()
+        if saldo!=linesaldo:
+            totalline = abono1 = interes1 = 0.0
+            cobros = self.pool.get('venta.cobro')
+            for form in self.browse(cr, uid, ids, context=context):
+                total= form.valor - form.entrada
+                if form.cobros_ids:
+                    for line in form.cobros_ids:
+                        values={}
+                        abono1 = line.abono
+                        interes1=line.interes
+                        totalline=line.total
+                        if total==totalline:
+                            saldo = total-abono1+interes1
+                            values['saldo']=saldo
+                            cobros.write(cr, uid, line.id, values)
+                            total= saldo
+                        else:
+                            saldo = total-abono1+interes1
+                            values['saldo']=saldo
+                            values['total']=total
+                            cobros.write(cr, uid, line.id, values)
+                            total=saldo                             
         return res
     
     def _get_name(self, cr, uid, ids, prop, unknow_none, context):
@@ -175,28 +202,35 @@ class venta_cobro(osv.osv):
     _name = 'venta.cobro'
 
     def get_total(self, cr, uid, ids, abono, context):
-        venta_id=0;
-        tree= self.browse(cr, uid, ids, context=context)
+        venta_id = interes= total= abono1=0.0
+        #tree= self.browse(cr, uid, ids, context=context)
         if not context:
             context={}
         else:
             venta_id= context.get('venta_id')
-            cobro_id= context.get('cobro_id')
+            abono1=context.get('abono')
+            interes=context.get('interes')
+            total=context.get('total')
         values={}
         val={}
-        import pdb
-        pdb.set_trace()
+        #import pdb
+        #pdb.set_trace()
         venta = self.pool.get('venta.credito').browse(cr,uid,venta_id,context)
         inv_obj = self.pool.get('venta.credito')
-        values['total']=venta.saldo
-        saldo = values['total'] - abono
+        if total == 0.0:
+            values['total']=venta.saldo
+        elif total==venta.saldo:
+            values['total']=total
+        else:
+            values['total']=venta.saldo
+        saldo = values['total'] - abono1 + interes
         if saldo < 0:
             saldo=-999999999;
         else:
             values['saldo']=saldo
             val['saldo1']=saldo
             inv_obj.write(cr, uid, venta_id, val, context=context)
-            self.write(cr, uid, ids, values, context)
+            #self.write(cr, uid, ids, values, context)
         return {'value':values}
         
     _columns = {
@@ -218,7 +252,7 @@ class cobro_wizard(osv.osv_memory):
     _name = 'cobro.wizard'
     
     def get_total(self, cr, uid, ids, venta_id, context=None):
-        saldo = valor = entrada =abono= 0.0
+        saldo = entrada =abono=interes= 0.0
         values={}
         val={}
         venta = self.pool.get('venta.credito').browse(cr,uid,venta_id,context)
@@ -228,8 +262,8 @@ class cobro_wizard(osv.osv_memory):
             if context.get("abono"):             
                 abono=context.get("abono")
             if context.get("interes"):
-                valor=context.get("interes")
-            saldo = values['total'] - abono
+                interes=context.get("interes")
+            saldo = values['total'] - abono + interes
             if saldo < 0:
                 saldo=-999999999;
             else:
