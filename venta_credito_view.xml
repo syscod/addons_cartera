@@ -288,7 +288,7 @@
         </record>
 <!-- ############################COMPRAS########################################### -->
 
-<!-- SOLO PROBANDOLE AL JORCH LO Q DIGO -->      
+<!-- SOLO PROBANDOLE AL JORCH LO Q DIGO -->    
 
 <!-- ############################MENUS########################################### -->
 
@@ -297,11 +297,13 @@
 	        <menuitem id="menu_venta_credito_list" name="Ventas" parent="menu_venta_credito"/>
 		        <menuitem id="menu_cobro_wizard" parent="menu_venta_credito_list" action="action_cobro_new_wizard" sequence="10"/>
 		        <menuitem id="menu_venta_credito_wizard" parent="menu_venta_credito_list" action="action_venta_credito_new_wizard" sequence="5"/>
-		        <menuitem id="menu_venta_credito_tree" parent="menu_venta_credito_list" action="action_venta_credito_new_form" sequence="0"/>
+		        <menuitem id="menu_venta_credito_tree" parent="menu_venta_credito_list" action="action_venta_credito_new_form" sequence="1"/>
+		        <menuitem id="menu_venta_credito_client" name="Clientes" parent="menu_venta_credito_list" action="base.action_partner_customer_form" sequence="0"/>
 		    <!-- COMPRAS -->
         	<menuitem id="menu_compra_credito_list" name="Compras" parent="menu_venta_credito"/>
         		<menuitem id="menu_pago_wizard" parent="menu_compra_credito_list" action="action_pago_new_wizard" sequence="10"/>
 		        <menuitem id="menu_compra_credito_wizard" parent="menu_compra_credito_list" action="action_compra_credito_new_wizard" sequence="5"/> 
-        		<menuitem id="menu_compra_credito_tree" parent="menu_compra_credito_list" action="action_compra_credito_new_form" sequence="0"/>
+        		<menuitem id="menu_compra_credito_tree" parent="menu_compra_credito_list" action="action_compra_credito_new_form" sequence="1"/>
+        		<menuitem id="menu_compra_credito_supplier" name="Proveedores" parent="menu_compra_credito_list" action="base.action_partner_supplier_form" sequence="0"/>
     </data>
 </openerp>
