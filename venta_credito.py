@@ -31,7 +31,7 @@ class venta_credito(osv.osv):
             entrada=ent    
         saldo = valor -val- entrada
         if saldo < 0:
-            saldo=-999999999;
+            saldo=-99;
         values = {'saldo':saldo}
         return {'value':values}
      
@@ -40,24 +40,28 @@ class venta_credito(osv.osv):
         #pdb.set_trace()
         res = {}
         value={}
-        if context is None:
-            context = {}
-        if context.get("fecha_venta"):
-            res['fecha_venta'] = context.get("fecha_venta")
-        if context.get("numero"):
-            res['numero'] = context.get("numero")
-        if context.get("cliente_id"):
-            res['cliente_id'] = context.get("cliente_id")
-        cliente = self.pool.get('res.partner').browse(cr,uid,res['cliente_id'] ,context)
-        val = ""
-        if cliente:
-            if res['numero'] and res['fecha_venta']:
-                val= res['numero'] + "|" + cliente.name + "|" +  res['fecha_venta']
-            elif not res['numero'] and res['fecha_venta']:
-                val = cliente.name + "|" + res['fecha_venta']
-            elif not res['fecha_venta'] and res['numero'] :
-                val =res['numero'] + "|" +  cliente.name
-            value['name'] = val
+        if context:  
+            cliente = self.pool.get('res.partner').browse(cr,uid,context['cliente_id'] ,context)  
+            if context.get("fecha_venta"):
+                res['fecha_venta'] = context.get("fecha_venta")
+            if context.get("numero"):
+                res['numero'] = context.get("numero")
+            else:
+                res['numero']='VC000'
+            if context.get("cliente_id"):
+                res['cliente_id'] = context.get("cliente_id")
+                
+            val = ""
+            if cliente:
+                if res['numero'] and res['fecha_venta']:
+                    val= res['numero'] + "|" + cliente.name + "|" +  res['fecha_venta']
+                elif not res['numero'] and res['fecha_venta']:
+                    val = cliente.name + "|" + res['fecha_venta']
+                elif not res['fecha_venta'] and res['numero'] :
+                    val =res['numero'] + "|" +  cliente.name
+                value['name'] = val
+        else:
+            value['name']=cliente.name
         return value
    
     def on_change_cliente(self, cr, uid, ids,cliente_id,context=None):
@@ -169,7 +173,7 @@ class venta_credito(osv.osv):
                 #'name':fields.char('Nombre', size=512, help="Nombre de la venta realizada."),
                 #'name':fields.function(_get_name, string='Descripcion', type='char', help="Nombre del credito"),
                 'name':fields.char('Venta', size=512, help="Identificador de la venta realizada."),
-                'numero':fields.char('Codigo', size=512, help="Identificador de la venta realizada."),
+                'numero':fields.char('Codigo', required=True,size=512, help="Identificador de la venta realizada."),
                 #'cliente_id':fields.char('Cliente', size=64, required = True, help="Cliente al que se le da el credito"),
                 'cliente_id':fields.many2one('res.partner', 'Cliente', required = True, help="Cliente al que se le da el credito"),  
                 'direccion':fields.char('Direccion', size=512, help="Direccion del cliente."),
@@ -235,6 +239,7 @@ class venta_cobro(osv.osv):
         
     _columns = {
                 'venta_credito_id':fields.many2one('venta.credito', 'Venta', required=1, ondelete='cascade'),
+                'ref':fields.char('Referencia', size=16),
                 'abono': fields.float('Abono', help="Valor que se abona a la deuda."),
                 'interes': fields.float('Interes', help="Registro de interes."),
                 'total': fields.float('Total', help="Total."),
@@ -270,21 +275,33 @@ class cobro_wizard(osv.osv_memory):
                 values['saldo']=saldo
                 val['saldo1']=saldo
                 #import pdb
-               # pdb.set_trace()
+                #pdb.set_trace()
                 inv_obj.write(cr, uid, venta_id, val, context=context)
         return values
     
     _columns = {
                 'venta_credito_id':fields.many2one('venta.credito', 'Venta', required=1, ondelete='cascade'),
+                'ref':fields.char('Referencia', size=16,requiered=True),
                 'abono': fields.float('Abono', help="Valor que se dio de entrada."),
                 'interes': fields.float('Interes', help="Valor que se dio de entrada."),
                 'fecha_cobro':fields.date('Fecha', select=True, help="Dia en que se realiza la venta"),
+                'saldo':fields.float('Saldo'),
                 }
     
     _defaults = {
         'fecha_cobro': lambda *a: time.strftime('%Y-%m-%d'),
     }
     
+    def onChangeVenta(self, cr, uid, ids, venta_id, context=None):
+        saldo=0.0
+        values={}
+        venta = self.pool.get('venta.credito').browse(cr,uid,venta_id,context)
+        saldo=venta.saldo
+        values = {'saldo':saldo}
+        if saldo<=0:
+            return False
+        return {'value':values}
+        
     def do_cobro(self, cr, uid, ids, context=None):
         cobro_pool =  self.pool.get('venta.cobro')
         res={}
@@ -311,7 +328,8 @@ class cobro_wizard(osv.osv_memory):
                                             'abono': res['abono'],
                                             'interes': res['interes'] ,
                                             'saldo':val['saldo'],
-                                            'venta_credito_id': res['venta_credito_id'],           
+                                            'venta_credito_id': res['venta_credito_id'],    
+                                            'ref':form.ref       
                             })
         return True
     
@@ -346,6 +364,8 @@ class venta_credito_wizard(osv.osv_memory):
         return res
     
     def get_name(self, cr, uid, ids, context):
+        #import pdb
+        #pdb.set_trace()
         res = {}
         value={}
         if context is None:
@@ -354,6 +374,8 @@ class venta_credito_wizard(osv.osv_memory):
             res['fecha_venta'] = context.get("fecha_venta")
         if context.get("numero"):
             res['numero'] = context.get("numero")
+        else:
+            res['numero'] = 'VC000'
         if context.get("cliente_id"):
             res['cliente_id'] = context.get("cliente_id")
         cliente = self.pool.get('res.partner').browse(cr,uid,res['cliente_id'] ,context)
@@ -407,7 +429,7 @@ class venta_credito_wizard(osv.osv_memory):
     _columns = {
                 #'name':fields.function(_get_name, string='Descripcion', type='char', help="Nombre del credito"),
                 'name':fields.char('Descripcion', size=120, help="Identificador de la venta realizada."),
-                'numero':fields.char('Codigo', size=64, help="Identificador de la venta realizada."),
+                'numero':fields.char('Codigo', required=True, size=64, help="Identificador de la venta realizada."),
                 'cliente_id':fields.many2one('res.partner', 'Cliente',required = True, help="Cliente al que se le da el credito"),
                 #'name':fields.function(_get_name, string='Nombre', type='char', help="Nombre del credito"),
                 #'numero':fields.char('Numero', size=512, help="Identificador de la venta realizada."),
@@ -434,6 +456,8 @@ class venta_credito_wizard(osv.osv_memory):
                 res['fecha_venta'] = context.get("fecha_venta")
             if context.get("numero"):
                 res['numero'] = context.get("numero")
+            else:
+                res['numero']='CV000'
             if context.get("cliente_id"):
                 res['cliente_id'] = context.get("cliente_id")
             if context.get("garante_id"):
@@ -491,14 +515,26 @@ class pago_wizard(osv.osv_memory):
     
     _columns = {
                 'venta_credito_id':fields.many2one('venta.credito', 'Venta', required=1, ondelete='cascade'),
+                'ref':fields.char('Referencia', size=16, requiered=True),
                 'abono': fields.float('Abono', help="Valor que se dio de entrada."),
                 'interes': fields.float('Interes', help="Valor que se dio de entrada."),
                 'fecha_cobro':fields.date('Fecha', select=True, help="Dia en que se realiza la venta"),
+                'saldo':fields.float('Saldo'),
                 }
     
     _defaults = {
         'fecha_cobro': lambda *a: time.strftime('%Y-%m-%d'),
     }
+    
+    def onChangeVenta(self, cr, uid, ids, venta_id, context=None):
+        saldo=0.0
+        values={}
+        venta = self.pool.get('venta.credito').browse(cr,uid,venta_id,context)
+        saldo=venta.saldo
+        values = {'saldo':saldo}
+        if saldo<=0:
+            return False
+        return {'value':values}
     
     def do_pago(self, cr, uid, ids, context=None):
         pago_pool =  self.pool.get('venta.cobro')
@@ -526,7 +562,8 @@ class pago_wizard(osv.osv_memory):
                                             'abono': res['abono'],
                                             'interes': res['interes'] ,
                                             'saldo':val['saldo'],
-                                            'venta_credito_id': res['venta_credito_id'],           
+                                            'venta_credito_id': res['venta_credito_id'],
+                                            'ref':form.ref           
                             })                
                 
         return True
@@ -583,6 +620,8 @@ class compra_credito_wizard(osv.osv_memory):
             res['fecha_venta'] = context.get("fecha_venta")
         if context.get("numero"):
             res['numero'] = context.get("numero")
+        else:
+            res['numero'] = 'VC000'
         if context.get("cliente_id"):
             res['cliente_id'] = context.get("cliente_id")
         cliente = self.pool.get('res.partner').browse(cr,uid,res['cliente_id'] ,context)
@@ -616,7 +655,7 @@ class compra_credito_wizard(osv.osv_memory):
     _columns = {
                 'name':fields.char('Descripcion', size=120, help="Nombre de la venta realizada."),
                 #'name':fields.function(_get_name, string='Descripcion', type='char', help="Nombre del credito"),
-                'numero':fields.char('Codigo', size=512, help="Identificador de la venta realizada."),
+                'numero':fields.char('Codigo', size=512, required=True, help="Identificador de la venta realizada."),
                 'cliente_id':fields.many2one('res.partner', 'Cliente', required = True, help="Cliente al que se le da el credito"),
                 'garante_id':fields.many2one('res.partner', 'Garante', help="Garante del credito de la venta."),
                 'entrada':fields.float('Entrada', help="Valor que se dio de entrada."),
@@ -640,6 +679,8 @@ class compra_credito_wizard(osv.osv_memory):
                 res['fecha_venta'] = context.get("fecha_venta")
             if context.get("numero"):
                 res['numero'] = context.get("numero")
+            else:
+                res['numero'] = 'VC000'
             if context.get("cliente_id"):
                 res['cliente_id'] = context.get("cliente_id")
             values=self.on_change_cliente(cr, uid, ids, res['cliente_id'], context)    

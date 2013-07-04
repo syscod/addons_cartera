@@ -40,6 +40,7 @@
                  <field name="cobros_ids" string="Líneas de cobros" >
                  	<tree string="Cobros" editable="bottom">
                     	<field name="fecha_cobro" widget="date" string="Fecha de cobro"/>
+                    	<field name="ref"/>
                         <field name="total"/>                            
                         <field name="abono" on_change="get_total(abono,context)" context="{'abono':abono, 'total':total, 'interes':interes, 'venta_id':parent.id, 'cobro_id':id}" sum="Total cobrado"/>
                         <field name="interes" on_change="get_total(abono,context)" context="{'abono':abono,'total':total,'interes':interes, 'venta_id':parent.id, 'cobro_id':id}" sum="Total Interes" />
@@ -74,7 +75,9 @@
 		<form string="Registro de Cobro" version="7.0">
 			<separator string="Ingrese el abono del cliente:" colspan="4" />
 			<group>
-				 <field name="venta_credito_id" domain="[('es_venta','=',1)]" class="oe_inline"/>
+				 <field name="ref"/>
+				 <field name="venta_credito_id" on_change="onChangeVenta(venta_credito_id)" domain="[('es_venta','=',1)]" class="oe_inline"/>
+				 <field name="saldo" class="oe_inline"/>
 				 <label for="abono"/>
                  <div> 
                     <field name="abono" class="oe_inline"/>
@@ -182,6 +185,7 @@
                  <field name="cobros_ids" string="Lineas de Pagos" widget="one2many_list">
                  	<tree string="Cobros" editable="bottom">
                     	<field name="fecha_cobro" string="Fecha de pago" width="20"/>
+                    	<field name="ref"/>
                         <field name="total" />                            
                         <field name="abono" on_change="get_total(abono,context)" context="{'abono':abono, 'total':total, 'interes':interes, 'venta_id':parent.id, 'cobro_id':id}"  sum="Total Pagado"/>
                         <field name="interes" on_change="get_total(abono,context)" context="{'abono':abono, 'total':total, 'interes':interes, 'venta_id':parent.id, 'cobro_id':id}" sum="Total Interes" />
@@ -216,7 +220,9 @@
 	    <field name="arch" type="xml">  
 		<form string="Registro de pago" version="7.0">
 			<group>
-				 <field name="venta_credito_id" domain="[('es_venta','=',0)]" class="oe_inline"/>
+				 <field name="ref"/>
+				 <field name="venta_credito_id" on_change="onChangeVenta(venta_credito_id)" domain="[('es_venta','=',0)]" class="oe_inline"/>
+				 <field name="saldo" class="oe_inline"/>
                  <field name="abono" class="oe_inline"/>
                  <field name="fecha_cobro" string="Fecha de pago" class="oe_inline"/>
 			</group>
